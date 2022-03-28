@@ -1082,3 +1082,7 @@ end
     y = randn(2)
     @inferred(test(x, y)) == [0, 0]
 end
+
+# test that `Broadcast` definition is defined as total and eligible for concrete evaluation
+@test Base.infer_effects(BroadcastStyle, (DefaultArrayStyle{1},DefaultArrayStyle{2},)) |>
+    Core.Compiler.is_concrete_eval_eligible
