@@ -512,11 +512,24 @@ This `setting` combines the following other assertions:
 - `:terminates_globally`
 and is a convenient shortcut.
 
+---
+# `:total_may_throw`
+
+This `setting` combines the following other assertions:
+- `:consistent`
+- `:effect_free`
+- `:terminates_globally`
+and is a convenient shortcut.
+
 !!! note
-    `@assume_effects :total` is similar to `@Base.pure` with the primary
+    This setting is particularly useful since it allows the compiler to evaluate a call of
+    the applied method when all the call arguments are fully known, no matter if the call
+    results in an error or not.
+
+    `@assume_effects :total_may_throw` is similar to `Base.@pure` with the primary
     distinction that the `:consistent`-cy requirement applies world-age wise rather
     than globally as described above. However, in particular, a method annotated
-    `@Base.pure` is always `:total`.
+    `Base.@pure` should always be `:total` or `:total_may_throw`.
 """
 macro assume_effects(args...)
     (consistent, effect_free, nothrow, terminates_globally, terminates_locally) =
@@ -537,12 +550,14 @@ macro assume_effects(args...)
             terminates_locally = true
         elseif setting === :total
             consistent = effect_free = nothrow = terminates_globally = true
+        elseif setting === :total_may_throw
+            consistent = effect_free = terminates_globally = true
         else
             throw(ArgumentError("@assume_effects $setting not supported"))
         end
     end
     ex = args[end]
-    isa(ex, Expr) || throw(ArgumentError("Bad expression `$ex` in @constprop [settings] ex"))
+    isa(ex, Expr) || throw(ArgumentError("Bad expression `$ex` in `@assume_effects [settings] ex`"))
     if ex.head === :macrocall && ex.args[1] == Symbol("@ccall")
         ex.args[1] = GlobalRef(Base, Symbol("@ccall_effects"))
         insert!(ex.args, 3, Core.Compiler.encode_effects_override(Core.Compiler.EffectsOverride(
