@@ -1029,9 +1029,9 @@ function typeinf_ext_toplevel(interp::AbstractInterpreter, linfo::MethodInstance
     return src
 end
 
-return_type(@nospecialize(f), t::DataType) = return_type(f, t, get_tsl_world_counter()) # this method has a special tfunc
+return_type(@nospecialize(f), t::DataType) = return_type(f, t, get_tls_world_counter()) # this method has a special tfunc
 return_type(@nospecialize(f), t::DataType, world::UInt) = return_type(Tuple{Core.Typeof(f), t.parameters...}, world)
-return_type(t::DataType) = return_type(t, get_tsl_world_counter())
+return_type(t::DataType) = return_type(t, get_tls_world_counter())
 return_type(t::DataType, world::UInt) = call_in_typeinf_world(Any[_return_type, NativeInterpreter(world), t])
 function _return_type(interp::AbstractInterpreter, t::DataType)
     rt = Union{}
@@ -1053,9 +1053,9 @@ function _return_type(interp::AbstractInterpreter, t::DataType)
     return rt
 end
 
-infer_effects(@nospecialize(f), t::DataType) = infer_effects(f, t, get_tsl_world_counter())
+infer_effects(@nospecialize(f), t::DataType) = infer_effects(f, t, get_tls_world_counter())
 infer_effects(@nospecialize(f), t::DataType, world::UInt) = infer_effects(Tuple{Core.Typeof(f), t.parameters...}, world)
-infer_effects(t::DataType) = infer_effects(t, get_tsl_world_counter())
+infer_effects(t::DataType) = infer_effects(t, get_tls_world_counter())
 infer_effects(t::DataType, world::UInt) = call_in_typeinf_world(Any[_infer_effects, NativeInterpreter(world), t])
 function _infer_effects(interp::AbstractInterpreter, t::DataType)
     f = singleton_type(t.parameters[1])
