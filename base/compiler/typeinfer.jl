@@ -1083,7 +1083,7 @@ function _infer_effects(interp::AbstractInterpreter, t::DataType)
     return effects
 end
 
-get_tsl_world_counter() = ccall(:jl_get_tls_world_age, UInt, ())
+get_tls_world_counter() = ccall(:jl_get_tls_world_age, UInt, ())
 
 function call_in_typeinf_world(args::Vector{Any})
     return ccall(:jl_call_in_typeinf_world, Any, (Ptr{Ptr{Cvoid}}, Cint), args, length(args))
